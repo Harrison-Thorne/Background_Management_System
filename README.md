@@ -83,7 +83,7 @@ npm run dev
 
 默认端口：
 - 前端：http://localhost:5173
-- 后端：http://localhost:8080
+- 后端：http://localhost:9090
 
 ## 📦 功能预览（截图可自行添加）
 
