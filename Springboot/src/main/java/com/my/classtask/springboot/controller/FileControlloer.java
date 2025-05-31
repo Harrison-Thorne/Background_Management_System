@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/files")
@@ -56,5 +60,36 @@ public class FileControlloer {
             throw new CustomException("500","File Download Failure");
         }
 
+    }
+
+    @PostMapping("/wang/upload")
+    public Map<String,Object> wangEditorUpload(MultipartFile file){
+        String originalFilename=file.getOriginalFilename();//xxx.png
+        if(!FileUtil.isDirectory(filePath)){//目录不存在先创建目录
+            FileUtil.mkdir(filePath);
+        }
+        //提供文件存储的完整的路径 给文件名加一个唯一的标识
+        String fileName= System.currentTimeMillis()+"_"+originalFilename ;
+        String realPath=filePath+fileName;
+        try{
+            FileUtil.writeBytes(file.getBytes(),realPath);
+        }catch (IOException e){
+            e.printStackTrace();
+            throw new CustomException("500","File Upload Failure");
+        }
+        String url="http://localhost:9090/files/download/" + fileName;
+        // wangEditor上传图片成功后，需要返回的参数
+        Map<String, Object> resMap = new HashMap<>();
+
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        Map<String, Object> urlMap = new HashMap<>();
+        urlMap.put("url", url);  // 请确保此处 url 变量已定义
+        list.add(urlMap);
+
+        resMap.put("errno", 0);  // 0 表示成功
+        resMap.put("data", list);
+
+        return resMap;
     }
 }

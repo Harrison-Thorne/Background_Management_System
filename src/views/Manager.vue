@@ -34,13 +34,17 @@
           <el-icon><DataAnalysis /></el-icon>
           Data Statistics
         </el-menu-item>
-        <el-sub-menu index="1">
+        <el-menu-item index="/manager/Article" v-if="role === 'ADMIN'">
+          <el-icon><Reading /></el-icon>
+          Article Management
+        </el-menu-item>
+        <el-sub-menu index="1" v-if="role === 'ADMIN'">
           <template #title>
             <el-icon><User /></el-icon>
             <span>User Management</span>
           </template>
-          <el-menu-item index="/manager/Admin">Admin Information</el-menu-item>
-          <el-menu-item index="/manager/Employee">Staff Information</el-menu-item>
+          <el-menu-item index="/manager/Admin" >Admin Information</el-menu-item>
+          <el-menu-item index="/manager/Employee" >Staff Information</el-menu-item>
         </el-sub-menu>
         <el-menu-item index="/manager/person">
           <el-icon><UserFilled /></el-icon>
@@ -66,9 +70,11 @@
 </template>
 <script setup>
 
-import {DataAnalysis, House, SwitchButton, User, UserFilled} from "@element-plus/icons-vue";
+import {DataAnalysis, House, Reading, SwitchButton, User, UserFilled} from "@element-plus/icons-vue";
 import router from "@/router/index.js";
 import {reactive} from "vue";
+
+const role = JSON.parse(localStorage.getItem('xm-pro-user') || '{}').role || 'EMP'
 
 const data=reactive({
   user:JSON.parse(localStorage.getItem('xm-pro-user'))

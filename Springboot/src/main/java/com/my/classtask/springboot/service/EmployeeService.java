@@ -11,11 +11,16 @@ import com.my.classtask.springboot.exception.CustomException;
 import com.my.classtask.springboot.mapper.EmployeeMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import com.my.classtask.springboot.event.EmployeeUpdateEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 @Service
 public class EmployeeService {
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
     @Resource
     private EmployeeMapper employeeMapper;
     public void add(Employee employee) {
@@ -47,7 +52,10 @@ public class EmployeeService {
     }
     public void update(Employee employee) {
         employeeMapper.updateById(employee);
+        // 发布事件（观察者模式核心）
+        eventPublisher.publishEvent(new EmployeeUpdateEvent(this, employee));
     }
+
     public List<Employee> selectAll(Employee employee) {
         return employeeMapper.selectAll(employee);
     }

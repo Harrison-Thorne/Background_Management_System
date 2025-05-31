@@ -9,6 +9,9 @@ import com.my.classtask.springboot.exception.CustomException;
 import com.my.classtask.springboot.mapper.AdminMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import com.my.classtask.springboot.event.AdminUpdateEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -16,6 +19,8 @@ import java.util.List;
 public class AdminService {
     @Resource
     private AdminMapper adminMapper;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
     public void add(Admin admin) {
         String username=admin.getUsername();
         Admin dbAdmin=adminMapper.selectByUsername(username);
@@ -39,9 +44,7 @@ public class AdminService {
             this.deleteById((id));
         }
     }
-    public void update(Admin admin) {
-        adminMapper.updateById(admin);
-    }
+
     public List<Admin> selectAll(Admin admin) {
         return adminMapper.selectAll(admin);
     }
@@ -78,5 +81,11 @@ public class AdminService {
         }
         admin.setPassword(account.getNewPassword());
         this.update(admin);
+    }
+
+    public void update(Admin admin) {
+        adminMapper.updateById(admin);
+        // 发布事件，供监听器处理
+        eventPublisher.publishEvent(new AdminUpdateEvent(this, admin));
     }
 }

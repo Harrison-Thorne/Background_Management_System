@@ -1,138 +1,205 @@
 <template>
   <div>
-    <div style="margin-bottom: 20px">
-      <RouterLink to="/manager/test">跳转到Test.vue</RouterLink>|
-      <a href="/manager/test">通过a标签跳转到Test.vue</a>
-    </div>
-    <div style="margin-bottom: 20px">
-      <el-button type="primary" @click="router.push('/manager/test')">push跳转到新的页面</el-button>
-      <el-button type="primary" @click="router.replace('/manager/test')">replace跳转到新的页面</el-button>
-    </div>
-    <div style="margin-bottom: 20px">
-      <el-button type="primary" @click="router.push({path:'/manager/test',query:{id:2,name:'tom'}})">路由传参等于1</el-button>
-    </div>
-    <div>
-      <el-input v-model="data.input" style="width: 240px" placeholder="Please input"  :suffix-icon="Calendar"/>
-      <el-input v-model="data.input" style="width: 240px" placeholder="Please input"  :prefix-icon="Calendar"/>
-      <el-input v-model="data.descr" style="width: 240px"  type="textarea" placeholder="Please input"/>
-    </div>
-
-    <div>
-      <el-select
-          clearable
-          multiple
-          v-model="data.value"
-          placeholder="Please Select"
-          size="large"
+    <!-- 搜索栏 -->
+    <div style="margin-bottom: 16px; display: flex; justify-content: flex-end">
+      <el-input
+          v-model="searchKeyword"
+          placeholder="搜索姓名"
           style="width: 240px"
-      >
-        <el-option
-            v-for="item in data.options"
-            :key="item.name"
-            :label="item.name"
-            :value="item.name"
-        />
-      </el-select>
+          clearable
+          @input="filterData"
+      />
     </div>
 
-    <div style="margin:20px">
-      <el-radio-group v-model="data.sex">
-        <el-radio value="male">男</el-radio>
-        <el-radio value="femal">女</el-radio>
-      </el-radio-group>
-      <el-radio-group marginv-model="radio1" size="large" v-model="data.tag">
-        <el-radio-button label="What I post" value="What I post"/>
-        <el-radio-button label="What I praise" value="What I praise"/>
-        <el-radio-button label="What I collect" value="What I collec"/>
-      </el-radio-group>
-    </div>
-    <div style="margin: 20px">
-      <el-checkbox-group v-model="data.checkList">
-        <el-checkbox v-for="item in data.cities" :key="item" :label="item" :value="item"/>
-      </el-checkbox-group>
-    </div>
-    <div style="margin: 20px">
-      <img src="@/assets/logo.svg" alt="" style="width:100px">
-      <el-image :src="url" alt="" style="width:100px;margin-left:100px"/>
-      <el-image :src="img" alt="" style="width:100px;margin-left:100px"/>
-    </div>
-    <div style="margin: 20px">
-      <el-carousel height="400px" width="500px">
-        <el-carousel-item v-for="item in data.imgs" :key="item">
-          <img :src="item" alt="" style="width: 100%">
-        </el-carousel-item>
-      </el-carousel>
-    </div>
-    <div>
-      <el-table :data="data.tableData" stripe style="width: 100%">
-        <el-table-column prop="date" label="Date" width="180" />
-        <el-table-column prop="name" label="Name" width="180" />
-        <el-table-column prop="address" label="Address" />
-        <el-table-column label="操作">
-          <template #default="scope">
-            {{scope.row}}
-          </template>
-        </el-table-column>
-      </el-table>
-      <div>
-        <el-pagination
-            v-model:current-page="data.currentPage"
-            :page-size="data.pageSize"
-            layout="total, prev, pager, next"
-            :total="data.tableData.length"
-        />
-      </div>
-    </div>
+    <!-- 表格展示 -->
+    <el-table
+        :data="paginatedData"
+        stripe
+        border
+        style="width: 100%; margin-bottom: 20px"
+        @sort-change="handleSortChange"
+    >
+      <el-table-column prop="date" label="日期" sortable="custom" width="180" />
+      <el-table-column prop="name" label="姓名" sortable="custom" width="180" />
+      <el-table-column prop="address" label="地址" />
+      <el-table-column prop="content" label="内容">
+        <template #default="scope">
+          <div v-html="scope.row.content"></div>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="200">
+        <template #default="scope">
+          <el-button type="primary" size="small" @click="openEditor(scope.row)">编辑</el-button>
+          <el-button type="danger" size="small" @click="del(scope.row.id)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!-- 分页 -->
+    <el-pagination
+        v-model:current-page="data.currentPage"
+        :page-size="data.pageSize"
+        layout="total, prev, pager, next"
+        :total="filteredData.length"
+        @current-change="handlePageChange"
+    />
+
+    <!-- 编辑弹窗 -->
+    <el-dialog v-model="editorVisible" title="编辑内容" width="600px" destroy-on-close>
+      <el-form :model="editForm" label-width="80px">
+        <el-form-item label="日期">
+          <el-input v-model="editForm.date"/>
+        </el-form-item>
+        <el-form-item label="姓名">
+          <el-input v-model="editForm.name"/>
+        </el-form-item>
+        <el-form-item label="地址">
+          <el-input v-model="editForm.address"/>
+        </el-form-item>
+        <el-form-item label="内容">
+          <Toolbar :editor="editorRef" style="border-bottom: 1px solid #ccc"/>
+          <Editor
+              v-model="editForm.content"
+              :defaultConfig="editorConfig"
+              mode="default"
+              style="height: 200px; border: 1px solid #ccc; margin-top: 10px"
+              @onCreated="handleEditorCreated"
+          />
+        </el-form-item>
+      </el-form>
+
+      <template #footer>
+        <el-button @click="editorVisible = false">取消</el-button>
+        <el-button type="primary" @click="saveEdit">保存</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
+
 <script setup>
-import {reactive} from "vue";
-import { Calendar, Search } from '@element-plus/icons-vue'
-import img from '@/assets/logo.svg'
-import img2 from '@/assets/1.jpg'
-import router from "@/router/index.js"
-import request from "@/utils/request.js";
-const data =reactive({
-  id:router.currentRoute.value.query.id,
-  input:null,
-  descr:'lsdjddksjakdjskdjskdjskad',
-  value:'',
-  options:[{name:"1"},{name:"2"},{name:"3"}],
-  sex:"male",
-  tag:'What I praise',
-  checkList:['Shanghai', 'Beijing'],
-  cities : ['Shanghai', 'Beijing', 'Guangzhou', 'Shenzhen'],
-  imgs:[img,img2],
-  currentPage:1,
-  pageSize:5,
-  tableData:[
+import {ref, reactive, computed, shallowRef, onBeforeUnmount} from 'vue'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import '@wangeditor/editor/dist/css/style.css'
+import {Editor, Toolbar} from '@wangeditor/editor-for-vue'
+
+// 数据源
+const data = reactive({
+  currentPage: 1,
+  pageSize: 5,
+  sortProp: '',
+  sortOrder: '',
+  tableData: [
     {
-      date: '2016-05-03',
-      name: 'Tom',
-      address: 'No. 189, Grove St, Los Angeles',
+      id: 1,
+      date: '2024-04-10',
+      name: 'Alice',
+      address: '123 Main St',
+      content: '<p>Hello World</p>',
     },
     {
-      date: '2016-05-02',
-      name: 'Tom',
-      address: 'No. 189, Grove St, Los Angeles',
+      id: 2,
+      date: '2024-04-11',
+      name: 'Bob',
+      address: '456 Park Ave',
+      content: '<p>Nice to meet you</p>',
     },
     {
-      date: '2016-05-04',
-      name: 'Tom',
-      address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-      date: '2016-05-01',
-      name: 'Tom',
-      address: 'No. 189, Grove St, Los Angeles',
+      id: 3,
+      date: '2024-04-12',
+      name: 'Carol',
+      address: '789 Broadway',
+      content: '<p>This is great!</p>',
     },
   ],
-  employeeList:[]
 })
 
-request.get('/employee/selectAll').then(res => {
-  console.log(res)
-  data.employeeList=res.data
+const searchKeyword = ref('')
+const filteredData = computed(() => {
+  return data.tableData.filter(row =>
+      row.name.toLowerCase().includes(searchKeyword.value.toLowerCase())
+  )
 })
-const url = 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
+
+const sortedData = computed(() => {
+  if (!data.sortProp || !data.sortOrder) return filteredData.value
+
+  return [...filteredData.value].sort((a, b) => {
+    const prop = data.sortProp
+    if (data.sortOrder === 'ascending') {
+      return a[prop] > b[prop] ? 1 : -1
+    } else {
+      return a[prop] < b[prop] ? 1 : -1
+    }
+  })
+})
+
+const paginatedData = computed(() => {
+  const start = (data.currentPage - 1) * data.pageSize
+  const end = start + data.pageSize
+  return sortedData.value.slice(start, end)
+})
+
+// 富文本编辑器
+const editorVisible = ref(false)
+const editorRef = shallowRef(null)
+const editForm = reactive({
+  id: null,
+  date: '',
+  name: '',
+  address: '',
+  content: '',
+})
+const editorConfig = {
+  placeholder: '请输入内容...',
+}
+
+function handleEditorCreated(editor) {
+  editorRef.value = editor
+}
+
+onBeforeUnmount(() => {
+  if (editorRef.value) editorRef.value.destroy()
+})
+
+function openEditor(row) {
+  Object.assign(editForm, row)
+  editorVisible.value = true
+}
+
+function saveEdit() {
+  const index = data.tableData.findIndex(item => item.id === editForm.id)
+  if (index !== -1) {
+    data.tableData[index] = {...editForm}
+    ElMessage.success('保存成功')
+  }
+  editorVisible.value = false
+}
+
+function del(id) {
+  ElMessageBox.confirm('确定要删除这条记录吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  })
+      .then(() => {
+        data.tableData = data.tableData.filter(item => item.id !== id)
+        ElMessage.success('删除成功')
+      })
+      .catch(() => {
+        ElMessage.info('已取消删除')
+      })
+}
+
+function handlePageChange(page) {
+  data.currentPage = page
+}
+
+function filterData() {
+  data.currentPage = 1
+}
+
+function handleSortChange({prop, order}) {
+  data.sortProp = prop
+  data.sortOrder = order
+}
 </script>
