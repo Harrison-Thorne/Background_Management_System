@@ -45,5 +45,8 @@ public class ArticleService {
         List<Article> list=articleMapper.selectAll(article);
         return PageInfo.of(list);
     }
-    
+
+    public Integer selectCountByDate(String date) {
+        return articleMapper.selectCountByDate(date);
+    }
 }

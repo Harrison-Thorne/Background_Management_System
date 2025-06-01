@@ -4,8 +4,7 @@
     <div style="height: 60px; background-color: #4285f4;display: flex; align-items: center;">
       <div style="width: 500px; display: flex;align-items: center; padding-left: 10px">
         <img style="width: 40px" src="@/assets/management.png" alt="">
-        <span style="font-size: 20px;color:#f5f5f5;">Background Management System
-        </span>
+        <span style="font-size: 20px;color:#f5f5f5;">Background Management System</span>
       </div>
       <div style="flex:1"></div>
       <div style="width:fit-content; display: flex;align-items: center;padding-right: 10px">
@@ -16,7 +15,7 @@
 
     <!-- 内容区域 -->
     <div style="display: flex; height: calc(100vh - 60px);">
-      <!-- 左侧菜单 -->
+      <!-- 左侧菜单 router控制跳转 default-active标明当前路径高亮 default-openeds默认展开有子菜单的-->
       <el-menu
           :default-active="router.currentRoute.value.path"
           style="width: 230px; border-right: 1px solid #ddd;"
@@ -34,9 +33,13 @@
           <el-icon><DataAnalysis /></el-icon>
           Data Statistics
         </el-menu-item>
-        <el-menu-item index="/manager/Article" v-if="role === 'ADMIN'">
+        <el-menu-item index="/manager/Article" >
           <el-icon><Reading /></el-icon>
           Article Management
+        </el-menu-item>
+        <el-menu-item index="/manager/Department" v-if="role === 'ADMIN'">
+          <el-icon><OfficeBuilding /></el-icon>
+          Department Management
         </el-menu-item>
         <el-sub-menu index="1" v-if="role === 'ADMIN'">
           <template #title>
@@ -61,7 +64,7 @@
 
       </el-menu>
 
-      <!-- 主体内容 -->
+      <!-- 主体内容 RouterView渲染子组件 @updateUser监听子组件中比如更新头像出来的emit信息则调用updateUser函数 -->
       <div style="flex: 1; padding: 20px; width:0; background-color: #eaeaf1">
         <RouterView @updateUser="updateUser"/>
       </div>
@@ -70,19 +73,24 @@
 </template>
 <script setup>
 
-import {DataAnalysis, House, Reading, SwitchButton, User, UserFilled} from "@element-plus/icons-vue";
+import {DataAnalysis, House, OfficeBuilding, Reading, SwitchButton, User, UserFilled} from "@element-plus/icons-vue";
 import router from "@/router/index.js";
 import {reactive} from "vue";
 
+//获取当前页面的是ADMIN还是EMP决定展示多少
 const role = JSON.parse(localStorage.getItem('xm-pro-user') || '{}').role || 'EMP'
 
+//初始化新头像数据 reactive是让其为代理变量，当user改变时候就会通知上面显示的data.user.avatar也该变了
 const data=reactive({
   user:JSON.parse(localStorage.getItem('xm-pro-user'))
 })
+
 const  logout =()=>{
   localStorage.removeItem('xm-pro-user')//清楚缓存数据
   location.href='/login'
 }
+
+//更新头像数据
 const updateUser=()=>{
   data.user=JSON.parse(localStorage.getItem('xm-pro-user'))
 }

@@ -6,7 +6,7 @@
 <mapper namespace="com.my.classtask.springboot.mapper.ArticleMapper">
     <insert id="insert" parameterType="com.my.classtask.springboot.entity.Article">
         insert into `article` (title,img,description,content,time)
-        value(#{title},#{img},#{description},#{content},#{time})
+            value(#{title},#{img},#{description},#{content},#{time})
     </insert>
 
     <update id="updateById" parameterType="com.my.classtask.springboot.entity.Article">

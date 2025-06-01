@@ -14,6 +14,7 @@ const router = createRouter({
         { path: 'person', name: 'person', meta:{title:'Self Information Page'},component: () => import('../views/Person.vue'),},
         { path: 'password', name: 'password', meta:{title:'Change Password'},component: () => import('../views/Password.vue'),},
         { path: 'article', name: 'article', meta:{title:'Article Information'},component: () => import('../views/Article.vue'),},
+        { path: 'department', name: 'department', meta:{title:'Department Information'},component: () => import('../views/Department.vue'),},
     ]},
       { path: '/login', name: 'Login', meta:{title:'Login System'},component: () => import('../views/Login.vue'),},
       { path: '/register', name: 'Register', meta:{title:'Register System'},component: () => import('../views/Register.vue'),},

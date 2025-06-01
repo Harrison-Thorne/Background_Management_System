@@ -2,10 +2,13 @@
   <div class="login-container">
     <div class="login-box">
       <div style="padding: 20px; background-color: white; margin-left: 130px; box-shadow: 0 0 10px rgba(0,0,0,0.2)">
+        <!--这里ref绑定,意味着 formRef.value 将会指向这个 <el-form> 组件实例 .validate()会根据你在 data.rules 中定义的规则，对所有带有 prop 属性的 el-form-item 进行验证-->
         <el-form ref="formRef" :rules="data.rules" :model="data.form" style="width: 450px">
           <div style="margin-bottom: 30px; font-size: 24px; color: cornflowerblue; font-weight: bold">
             Welcome to the Admin Dashboard
           </div>
+          <!--prop作用:调用表单的 validate 方法时（例如 formRef.value.validate(...)），Element Plus 会根据 prop 的值去 rules 对象中找到对应的规则，并对这个表单项进行验证。如果验证不通过，会显示错误消息-->
+          <!--‘:’是单向绑定，v-model是双向的-->
           <el-form-item prop="username">
             <el-input
                 size="large"
@@ -61,6 +64,8 @@ const data=reactive({
     ],
   }
 })
+
+//  formRef.value 指向 <el-form> 组件的实例. valid 为 true 表示所有表单项都通过了验证(先验证data.rules) .then(res => { ... })这是一个 Promise 回调，表示当后端响应成功返回时，执行这个函数
 const login =()=>{
   formRef.value.validate((valid)=>{
     if(valid){

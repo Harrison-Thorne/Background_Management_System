@@ -7,12 +7,12 @@
         <el-button type="warning" @click="reset">Reset</el-button>
       </div>
       <div class="card" style="margin-bottom: 5px">
-        <el-button type="primary" @click="handleAdd">Add</el-button>
-        <el-button type="danger" @click="delBatch">Batch Delete</el-button>
+        <el-button type="primary" @click="handleAdd" v-if="role === 'ADMIN'">Add</el-button>
+        <el-button type="danger" @click="delBatch" v-if="role === 'ADMIN'">Batch Delete</el-button>
       </div>
       <div class="card" style="margin-bottom: 5px" >
         <el-table :data="data.tableData" stripe  @selection-change="handleSelectionChange">
-          <el-table-column type="selection"  width="55" />
+          <el-table-column type="selection" width="55" v-if="role === 'ADMIN'"/>
           <el-table-column label="Title" prop="title"/>
           <el-table-column label="Cover">
             <template #default="scope">
@@ -28,8 +28,8 @@
           <el-table-column label="Release Time" prop="time"/>
           <el-table-column label="Operate">
             <template #default="scope">
-              <el-button @click="handleUpdate(scope.row)" link type="primary" :icon="Edit">Edit</el-button>
-              <el-button @click="del(scope.row.id)" link type="warning" :icon="Delete">Delete</el-button>
+              <el-button v-if="role === 'ADMIN'" @click="handleUpdate(scope.row)" link type="primary" :icon="Edit">Edit</el-button>
+              <el-button v-if="role === 'ADMIN'" @click="del(scope.row.id)" link type="warning" :icon="Delete">Delete</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -116,8 +116,8 @@
 </template>
 
 <script setup>
-import {reactive,ref} from "vue";
-import {Search,Edit,Delete} from "@element-plus/icons-vue"
+import {reactive} from "vue";
+import {Edit,Delete} from "@element-plus/icons-vue"
 import request from "@/utils/request.js";
 import {ElMessage, ElMessageBox} from "element-plus";
 
@@ -126,17 +126,20 @@ import { onBeforeUnmount, shallowRef } from "vue";
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 
 
-const data =reactive({
-  title:null,
-  tableData: [], 
-  pageNum:1,
-  pageSize:10,
-  total:0,
-  formVisible:false,
-  form:{},
-  ids:[],
-  viewVisible:false,
-  content:null,
+const userInfo = JSON.parse(localStorage.getItem('xm-pro-user') || '{}')
+const role = userInfo.role || 'EMP'   // 默认 EMP
+
+const data = reactive({
+  title: null,
+  tableData: [],
+  pageNum: 1,
+  pageSize: 10,
+  total: 0,
+  formVisible: false,
+  form: {},
+  ids: [],
+  viewVisible: false,
+  content: null,
 })
 
 /* wangEditor5 初始化开始 */
@@ -150,6 +153,7 @@ editorConfig.MENU_CONF['uploadImage'] = {
   server: baseUrl + '/files/wang/upload', // 服务端图片上传接口
   fieldName: 'file' // 服务端图片上传接口参数
 }
+
 
 // 组件销毁时，也及时销毁编辑器，否则可能会造成内存泄漏
 onBeforeUnmount(() => {
@@ -171,7 +175,7 @@ const view=(content)=>{
 const load = () => {
   request.get('/article/selectPage', {
         params:{
-          name:data.title,
+          title: data.title,
           pageNum:data.pageNum,
           pageSize:data.pageSize
         }

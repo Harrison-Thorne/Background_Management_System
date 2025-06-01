@@ -19,4 +19,6 @@ public interface ArticleMapper {
     void deleteById(Integer id);
 
 
+    @Select("select count(*) from article where time like '%${date}%'")
+    Integer selectCountByDate(String date);
 }
