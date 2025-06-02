@@ -185,7 +185,7 @@
 
 ---
 
-## 🖼️ 示例功能页（建议截图补充）
+## 🖼️ 示例功能页
 
 | 页面/功能   | 说明            |
 |-------------|-----------------|
@@ -194,6 +194,21 @@
 | 部门管理    | 部门维护        |
 | 文章管理    | 富文本/封面上传 |
 | 数据统计    | 图表可视化      |
+
+- 登录注册页
+![image](https://github.com/user-attachments/assets/aa3d639e-7ff9-4e7b-93ff-18290dcd7934)
+
+- 员工管理(批量导入)
+![image](https://github.com/user-attachments/assets/ecc12c09-6688-4fc7-bbaa-ac09dcd14bb2)
+
+-部门管理
+![image](https://github.com/user-attachments/assets/1792d738-8dde-4803-a08c-16361e6e661e)
+
+-文章管理(富文本编辑)
+![image](https://github.com/user-attachments/assets/c4221c42-03df-4986-ae45-9cfbc2b2193e)
+
+-数据统计
+![image](https://github.com/user-attachments/assets/fee2a1a6-4a3e-424a-8809-6357a051d9d0)
 
 ---
 
