@@ -16,11 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RestController
+@RestController //意味着这个类中所有方法的返回值都会被直接作为 HTTP 响应体发送给客户端，并且 Spring 会尝试将返回值转换为 JSON 格式
 @RequestMapping("/files")
 public class FileControlloer {
-    //获取到当前这个项目的根路径
-    private static final String filePath=System.getProperty("user.dir")+"/files/";
+    private static final String filePath=System.getProperty("user.dir")+"/files/"; //定义了所有上传文件在服务器上实际存储的根目录
 
     @PostMapping("/upload")
     public Result upload(MultipartFile file){//文件流接收前端发送来的文件
@@ -43,11 +42,11 @@ public class FileControlloer {
         return Result.success(url);
     }
 
-    @GetMapping("/download/{fileName}")
+    @GetMapping("/download/{fileName}") //HttpServletResponse response是Spring MVC 注入的 Servlet API 中的响应对象。你将直接通过它来向客户端写入文件内容
     public void download(@PathVariable String fileName, HttpServletResponse response)throws IOException{
         try {
             response.addHeader("Content-Disposition","attachment;filename="+ URLEncoder.encode(fileName, StandardCharsets.UTF_8));
-            response.setContentType("application/octet-stream");
+            response.setContentType("application/octet-stream");//通用的二进制流类型，告诉浏览器这是一个未知类型的二进制文件，应该按字节流处理（通常意味着下载）
             OutputStream os= response.getOutputStream();
             //获取到文件的字节数组
             String realPath=filePath+fileName;

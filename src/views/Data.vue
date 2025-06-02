@@ -89,6 +89,7 @@ const pieOption = {
   ],
 };
 
+//document: 代表整个 HTML 文档对象。  onMounted 的作用就是确保在 ECharts 初始化图表之前，图表所需的 DOM 容器已经准备就绪。防止初始化返回null
 onMounted(() => {
   const barChart = echarts.init(document.getElementById("bar"));
   request.get("/barData").then((res) => {

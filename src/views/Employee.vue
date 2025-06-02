@@ -9,6 +9,7 @@
       <div class="card" style="margin-bottom: 5px">
         <el-button type="primary" @click="handleAdd">Add</el-button>
         <el-button type="danger" @click="delBatch">Batch Delete</el-button>
+        <!--文件从前端上传到后端先-->
         <el-upload
             style="display : inline-block; margin:0 10px"
             action="http://localhost:9090/employee/import"

@@ -65,7 +65,7 @@
         <el-form-item label="Description" prop="description">
           <el-input text="textarea" :rows="3" v-model="data.form.description" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="内容">
+        <el-form-item label="Content">
           <div style="border: 1px solid #ccc; width: 100%">
             <Toolbar
                 style="border-bottom: 1px solid #ccc"
@@ -90,6 +90,7 @@
       </template>
     </el-dialog>
 
+    <!--close-on-click-modal当设置为 false 时，用户点击对话框外部的遮罩层时，对话框不会关闭。-->
     <el-dialog
         title="Content"
         v-model="data.viewVisible"
@@ -144,18 +145,19 @@ const data = reactive({
 
 /* wangEditor5 初始化开始 */
 const baseUrl = 'http://localhost:9090'
-const editorRef = shallowRef() // 编辑器实例，必须用 shallowRef
+//shallowRef用于保存第三方富文本编辑器的 JavaScript 实例，以便在 Vue 组件中对其进行程序化控制
+const editorRef = shallowRef() // 编辑器实例，必须用 shallowRef shallowRef() 只会使其 .value 属性本身具有响应式。如果 .value 是一个对象，Vue 不会对其内部属性进行深层响应式转换
 const mode = 'default'
 const editorConfig = { MENU_CONF: {} }
 
-// 图片上传配置
+// 图片上传配置 editorConfig 对象是 wangEditor 的一个配置容器，通过修改其 MENU_CONF 属性，你可以定制编辑器的各种行为，例如图片上传、视频上传、链接插入等。
 editorConfig.MENU_CONF['uploadImage'] = {
   server: baseUrl + '/files/wang/upload', // 服务端图片上传接口
   fieldName: 'file' // 服务端图片上传接口参数
 }
 
 
-// 组件销毁时，也及时销毁编辑器，否则可能会造成内存泄漏
+// 会在 Vue 组件即将被卸载（unmounted）或销毁之前被调用 清理wangEditor在 DOM 中创建的所有元素和绑定的事件，释放内存。
 onBeforeUnmount(() => {
   const editor = editorRef.value
   if (editor == null) return
@@ -164,7 +166,7 @@ onBeforeUnmount(() => {
 
 // 记录 editor 实例，重要！
 const handleCreated = (editor) => {
-  editorRef.value = editor
+  editorRef.value = editor//editorRef 就持有了富文本编辑器的 JavaScript 实例，你可以在组件的生命周期钩子中（如 onBeforeUnmount）或者其他需要操作编辑器的地方使用它。
 }
 /* wangEditor5 初始化结束 */
 const view=(content)=>{
@@ -189,7 +191,7 @@ const reset=()=>{
   data.title=null;
   load()
 }
-const handleImgSuccess=(res) =>{//后台返回的后端生成的图片链接
+const handleImgSuccess=(res) =>{ //后台返回的后端生成的图片链接存在data.form.img里面
   console.log(res.data);
   data.form.img=res.data;
 }

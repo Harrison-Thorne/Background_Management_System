@@ -112,6 +112,7 @@ const updateUser=()=>{
     })
   }
 }
+//初始化
 if(data.user.role==="EMP"){
   request.get('/employee/selectById/'+data.user.id).then(res=>{
       data.form=res.data

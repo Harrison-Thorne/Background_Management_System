@@ -44,9 +44,9 @@ public class DepartmentService {
     }
 
     public PageInfo<Department> selectPage(Department department, Integer pageNum,Integer pageSize) {
-        PageHelper.startPage(pageNum,pageSize);
+        PageHelper.startPage(pageNum,pageSize);//它即将拦截你接下来执行的第一个 MyBatis 查询
         List<Department> list=departmentMapper.selectAll(department);
-        return PageInfo.of(list);
+        return PageInfo.of(list);//PageInfo.of(list) 则会将这个“当前页的数据列表”以及 PageHelper 自动统计的“总记录数”等信息封装起来，方便返回给前端。
     }
     
 }

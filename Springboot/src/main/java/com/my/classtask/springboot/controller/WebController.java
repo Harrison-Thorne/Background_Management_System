@@ -56,12 +56,14 @@ public class WebController {
         }
         return Result.success();
     }
+    //.map(Employee::getDepartmentName): 对流中的每个 Employee 对象，调用其 getDepartmentName() 方法，提取出部门名称。此时流中的元素变成了部门名称字符串。
+    //.collect(Collectors.toSet()): 将流中的所有部门名称收集到一个 Set 集合中。Set 的特点是不包含重复元素，所以会自动对部门名称进行去重。
     @GetMapping("/barData")
     public Result getBarData(){
         Map<String,Object>map =new HashMap<>();
         List<Employee> employeeList= employeeService.selectAll(null);
         Set<String> departmentNameSet= employeeList.stream().map(Employee::getDepartmentName).collect(Collectors.toSet());//set字符串已经去重
-        map.put("department",departmentNameSet);//x轴数据
+        map.put("department",departmentNameSet);//将去重后的部门名称集合 departmentNameSet 放入 map 中，键名为 "department"。这部分数据将作为前端柱状图的 X 轴分类。
         List<Long> countList=new ArrayList<>();
         for(String departmentName : departmentNameSet){
             //统计这个部门下面员工数量

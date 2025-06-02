@@ -47,7 +47,7 @@
             <span>User Management</span>
           </template>
           <el-menu-item index="/manager/Admin" >Admin Information</el-menu-item>
-          <el-menu-item index="/manager/Employee" >Staff Information</el-menu-item>
+          <el-menu-item index="/manager/Employee" >Employee Information</el-menu-item>
         </el-sub-menu>
         <el-menu-item index="/manager/person">
           <el-icon><UserFilled /></el-icon>

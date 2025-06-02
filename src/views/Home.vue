@@ -62,10 +62,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 
 
-const sampleData = ref([
+const sampleData = [
   { Username: 'william841', Password: 'Pass1704', Name: 'William', Sex: 'Male', No: 'EMP10000',Age:'24',Description:'Problem solver.',DepartmentName:'Finance',DepartmentId:'4' },
-])
+]
 </script>

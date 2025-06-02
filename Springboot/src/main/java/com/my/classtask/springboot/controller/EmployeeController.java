@@ -69,7 +69,7 @@ public class EmployeeController {
     }
     //导出excel
     @GetMapping("/export")
-    public void export(HttpServletResponse response)throws Exception{
+    public void export(HttpServletResponse response)throws Exception{//返回void是因为直接通过 HttpServletResponse 对象向浏览器写入文件流。
         //1.拿到所有员工数据
         List<Employee>employeeList=employeeService.selectAll(null);
         //2.构建ExcelWriter
@@ -88,9 +88,9 @@ public class EmployeeController {
         //4.写出数据到writer
         writer.write(employeeList,true);
         //5.设置输出文件名称 以及输出流的头信息
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8");
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8");//告诉浏览器这是一个 Excel 文件
         String fileName = URLEncoder.encode("employee_info", "UTF-8");
-        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");//强制浏览器下载文件
         //6.写出到输出流
         ServletOutputStream os= response.getOutputStream();
         writer.flush(os);
@@ -102,8 +102,8 @@ public class EmployeeController {
     public Result importData(MultipartFile file) throws Exception{
         //1.拿到输入流构建reader
         InputStream inputStream= file.getInputStream();
-        ExcelReader reader= ExcelUtil.getReader(inputStream);
-        //2.读取excel里面的数据
+        ExcelReader reader= ExcelUtil.getReader(inputStream);//Hutool 工具库
+        //2.读取excel里面的数据 设置 Excel 表格的列头与 Java 实体类属性的映射关系。
         reader.addHeaderAlias("Username","username");
         reader.addHeaderAlias("Password","password");
         reader.addHeaderAlias("Name","name");
@@ -113,7 +113,7 @@ public class EmployeeController {
         reader.addHeaderAlias("Description","description");
         reader.addHeaderAlias("DepartmentName","departmentName");
         reader.addHeaderAlias("DepartmentId","departmentId");
-        List<Employee> employeeList=reader.readAll(Employee.class);
+        List<Employee> employeeList=reader.readAll(Employee.class); //读取整个 Excel 文件中的所有数据，并尝试根据之前设置的别名映射，将每一行数据自动转换为一个 Employee 类型的对象
         //3.写入List数据到数据库
         for(Employee employee:employeeList){
             employeeService.add(employee);

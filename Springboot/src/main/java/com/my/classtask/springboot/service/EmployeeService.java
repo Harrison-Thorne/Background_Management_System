@@ -40,6 +40,7 @@ public class EmployeeService {
             employee.setName(employee.getUsername());//默认名称
         }
         employee.setRole("EMP");//员工的角色
+        employee.setDepartmentId(1);//默认一号产品部门
         employeeMapper.insert(employee);
     }
     public void deleteById(Integer id) {
